@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+
+PLUGIN_BASE_PATH="$PLUGIN_PATH"
+if [[ -n $DOKKU_API_VERSION ]]; then
+  PLUGIN_BASE_PATH="$PLUGIN_ENABLED_PATH"
+fi
+source "$PLUGIN_BASE_PATH/common/functions"
+
+
+case "$1" in
+  app-name:set)
+    echo "TRUE" > "$DOKKU_ROOT/APP-NAME"
+    ;;
+
+  app-name:clear)
+    rm "$DOKKU_ROOT/APP-NAME"
+    ;;
+
+  app-name:get)
+    cat "$DOKKU_ROOT/APP-NAME"
+    ;;
+
+  help)
+    HELP=$(cat<<EOF
+    app-name:set, Set app name as env
+    app-name:clear, Clears app name
+    app-name:get, Display app name
+EOF
+)
+    if [[ -n $DOKKU_API_VERSION ]]; then
+      echo "$HELP"
+    else
+      cat && echo "$HELP"
+    fi
+    ;;
+
+  *)
+    exit $DOKKU_NOT_IMPLEMENTED_EXIT
+    ;;
+esac
